@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -u
+
 EXECUTABLE="$1"
 
 cat <<EOT
