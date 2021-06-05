@@ -1,13 +1,15 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 set -u
+
+source ".env"
 
 EXECUTABLE="$1"
 
 cat <<EOT
 # syntax = docker/dockerfile:experimental
 
-FROM fumieval/ubuntu-ghc:18.04-8.8.2 as builder
+FROM fumieval/ubuntu-ghc:$UBUNTU_VER-$GHC_VER as builder
 
 WORKDIR /build
 
@@ -17,7 +19,7 @@ ENV CABAL_CONFIG /build/cabal.config
 RUN cabal update
 
 RUN cabal install cabal-plan \\
-  --constraint='cabal-plan ^>=0.6' \\
+  --constraint='cabal-plan ^>=0.7' \\
   --constraint='cabal-plan +exe' \\
   --installdir=/usr/local/bin
 
@@ -27,11 +29,11 @@ RUN --mount=type=cache,target=dist-newstyle cabal build --only-dependencies
 COPY . /build
 
 RUN --mount=type=cache,target=dist-newstyle cabal build exe:$EXECUTABLE \\
-  && mkdir -p /build/artifacts && cp \$(cabal-plan list-bin $EXECUTABLE) /build/artifacts/
+  && mkdir -p /build/artifacts && cp \$(cabal-plan list-bin exe:$EXECUTABLE) /build/artifacts/
 
-RUN upx /build/artifacts/$EXECUTABLE; done
+RUN upx /build/artifacts/$EXECUTABLE
 
-FROM ubuntu:18.04
+FROM ubuntu:$UBUNTU_VER
 
 RUN apt-get -yq update && apt-get -yq --no-install-suggests --no-install-recommends install \\
     ca-certificates \\

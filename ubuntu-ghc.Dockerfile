@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 LABEL author="Fumiaki Kinoshita <fumiexcel@gmail.com>"
 # Based on https://github.com/phadej/docker-haskell-example
 
@@ -24,8 +24,8 @@ ENV LC_ALL=en_US.UTF-8
 # Some what stable dependencies
 # - separately, mostly to spot ghc and cabal-install
 RUN apt-get -yq --no-install-suggests --no-install-recommends install \
-    cabal-install-3.0 \
-    ghc-8.8.2
+    cabal-install-$CABAL_VER \
+    $GHC_VER
 
 # More dependencies, all the -dev libraries
 # - some basic collection of often needed libs
